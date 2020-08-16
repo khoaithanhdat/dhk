@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <form autocomplete="off">
+        <div class="card-body">
+          <div class="form-group row align-items-center">
+
+            <label class="col-md-1">Loại Import <span style="color: red;">&#42;</span></label>
+            <div class="col-md-5">
+              <select class="select-search" (change)="selectChangeHandler($event)">
+                <option value="0">Số chốt tháng/ Số loại trừ</option>
+                <option value="1">KPI chương trình hành động</option>
+              </select>
+              <p><span>You selected: </span><b>{{selected}}</b></p>
+            </div>
+
+            <label class="col-md-1">Tháng <span style="color: red;">&#42;</span></label>
+            <div class="col-md-5">
+              <mat-form-field class="font-text1">
+                <input matInput [matDatepicker]="dp" [formControl]="date">
+                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                <mat-datepicker #dp
+                                startView="year"
+                                (yearSelected)="chosenYearHandler($event)"
+                                (monthSelected)="chosenMonthHandler($event, dp)"
+                                panelClass="example-month-picker">
+                </mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="row">
+            <div class="col-md-12 d-flex justify-content-center flex-wrap">
+              <button class="btn btn-primary mb-2 mx-2 mt-4">
+                <i class="fa fa-search"></i> {{'management.target.button.search' | translate}}</button>
+              <button class="btn btn-primary mb-2 mx-2 mt-4" (click)="fileDownload(selected)"><i class="fa fa-download"></i> {{'management.target.button.download' | translate}}
+              </button>
+              <button class="btn btn-primary mb-2 mx-2 mt-4" (click)="confirm(template)"><i class="fa fa-upload"></i> {{'management.target.button.up' | translate}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left title-upload" >Import file</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="onBack()" size="6MB">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <input style="cursor: pointer;" class="input-upload" type="file" accept=".xlsx" name="file"
+           (change)="selectFile($event)" size="6MB">
+
+    <div *ngIf="mblnCheckFileNull == true" style="color: red">{{'management.target.modal.fileNull' | translate}}</div>
+    <div *ngIf="mnbrCode == 200 && mstrMessageUpload == null && mblnIsSelectFile" style="color: #20a8d8">
+      {{'management.target.modal.uploaded' | translate}}: {{mnbrSumSuccessfulRecord}}/{{mnbrSumRecord}}
+      {{'management.target.table.record.record' | translate}}</div>
+    <div *ngIf="mnbrCode == 200 && mstrMessageUpload == null && mblnIsSelectFile">
+      {{'management.target.modal.resultDownload' | translate}}
+      (<a href="#/vtt-target-level" *ngIf ="mblnIsClickHere" (click)="downloadResult(mstrResultFileName)" class="a-upload">{{'management.target.modal.here' | translate}}</a>
+      <a href="#/vtt-target-level" *ngIf ="!mblnIsClickHere" (click)="downloadResult(mstrResultFileName)">{{'management.target.modal.here' | translate}}</a>)
+    </div>
+    <div *ngIf="mnbrCode == 200 && mstrMessageUpload && mblnIsSelectFile" style="color: red">{{mstrMessageUpload}}</div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary click-btn-upload"
+            (click)="onBack()"><i class="fa fa-sign-out"></i> {{'management.target.button.back' | translate}}
+    </button>
+    <button (click)="upLoad(selected,date.value)" class="btn btn-primary click-btn-upload"
+            type="button"><i class="fa fa-upload"></i> {{'management.target.button.upload' | translate}}
+    </button>
+  </div>
+</ng-template>

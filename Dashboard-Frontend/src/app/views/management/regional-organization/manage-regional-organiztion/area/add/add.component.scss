@@ -1,0 +1,23 @@
+.vis-card-header-declare {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: .3rem .6rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.validate-red {
+  color: #f44336;
+}
+.small-massage-declare {
+  font-size: 0.7rem;
+  position: absolute;
+  //bottom: -16px;
+  //left: 15px;
+}
+.small-massage {
+  position: absolute;
+  top: 1.5rem;
+  left: 16px;
+
+  //white-space: nowrap;
+}

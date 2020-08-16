@@ -1,0 +1,238 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card-target">
+      <div class="card-body">
+        <div class="form-group mb-3 row align-items-center">
+          <label class="col-xl-1 col-md-2 col-sm-12 col-form-label fix-mr">Vùng <span style="color: red;">&#42;</span></label>
+            <div class="col-xl-3 col-md-4 col-sm-12">
+              <select name="product" class="select-search" (change)="selectChangeHandler($event)">
+                <option [ngValue]="null">{{'management.target.combobox.all' | translate}}</option>
+                <option *ngFor="let s of salArea" value="{{s.areaCode}}">{{s.areaName}}</option>
+              </select>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row" style="margin-top:1.5rem">
+  <div class="col-xl-12">
+    <div class="card">
+        <div class="card-body">
+          <div class="form-group row align-items-center">
+            <label class="col-md-12"><h4>Lương cụm trưởng</h4></label>
+            <label class="col-md-1" style="padding-top: 20px;">Lương cứng <span style="color: red;">&#42;</span></label>
+            <div class="col-md-5" style="padding-top: 20px;">
+              <mat-form-field class="example-full-width">
+                <input matInput [ngModel]="hardSalary | number:'1.0'" name="hardSalary"
+                     class="cvNumber" type="text" style="padding:0 .3rem" autocomplete="off" maxlength="10" (input)="checkSpecialLeader($event)">
+              </mat-form-field>
+              <div *ngIf="preventSpace" class="error-form25">
+                Lương cứng phải là số nguyên lớn hơn 0
+              </div>
+              <div class="error-form25" *ngIf="special">
+                {{'management.service.error.required' | translate}}
+              </div>
+            </div>
+
+            <div class="vis-card-header-custom leader-salary col-md-12" style="border-bottom: none;padding-top: 20px;">
+              <div class="row w-100">
+                <div class="col-md-3">
+                  <h5 style="margin-left: 0.3em;">Cấu hình lương cứng theo thời gian</h5>
+                </div>
+                <div class="col-md-7 custom-control custom-checkbox">
+                  <input type="checkbox" [(ngModel)]="checkLeader" name="checkLeader" ngDefaultControl (change)="checkLeaderForm($event)"/>
+                </div>
+                <div class="col-md-2 d-flex justify-content-center">
+                  <a href="javascript:void(0)" [(ngModel)]="addLeader" name="addLeader" ngDefaultControl *ngIf="addLeader" (click)="addSalaryLeader()" style="margin-left: 8.5em;">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <form [formGroup]="salaryLeaderAreaForm" class="w-100">
+              <div formArrayName="itemLeaderSalaryArea">
+                <div *ngFor="let items of salaryLeaderAreaForm['controls'].itemLeaderSalaryArea['controls']; let i = index;">
+                  <div class="col-md-12">
+                    <div class="card-target">
+                      <div [formGroupName]="i" class="card-body">
+                        <div class="form-group mb-3 row align-items-center">
+                          <label class="col-md-1" style="padding-left: 0;">Lương cứng <span style="color: red;">&#42;</span></label>
+                            <div class="col-md-5">
+                              <mat-form-field>
+                                <input matInput type="text" formControlName="{{'salaryLeaderArea'}}"  maxlength="10" (input)="checkLeaderSalaryTime($event,i)">
+                              </mat-form-field>
+                              <div *ngIf="preventSpace2[i]" class="error-form25">
+                                Lương cứng phải là số nguyên lớn hơn 0
+                              </div>
+                              <div class="error-form25" *ngIf="special2[i]">
+                                {{'management.service.error.required' | translate}}
+                              </div>
+                            </div>
+                            <label class="col-md-1">Tháng hết hạn </label>
+                            <div class="col-md-4">
+                              <small class="errorDate" *ngIf="isNullDate1[i]">Dữ liệu không được để trống</small>
+                              <small class="errorDate" *ngIf="mblnCur1[i]">Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại</small>
+                              <small class="errorDate" *ngIf="mblnvaLi1[i]">{{'management.target.filter.validate' | translate}}</small>
+                              <small class="errorDate" *ngIf="yearOut1[i] == true">{{'management.target.filter.yearOut' | translate}}</small>
+                              <mat-form-field class="font-text1">
+                                <input matInput #focus [matDatepicker]="itemLeaderSalaryArea"
+                                  placeholder="{{mdtDateSalaryLeader[i].value ? '' : 'MM/YYYY'}}"
+                                  [formControl]="mdtDateSalaryLeader[i]"
+                                  (input)="dateLeaderChange($event,i)" [hidden]=true [max]="mdtMaxDate" [min]="mdtMinDate">
+
+                                <input matInput *ngIf="mdtDateSalaryLeader[i].value" [ngModelOptions]="{standalone: true}"
+                                  [ngModel]="mdtDateSalaryLeader[i].value._d.toString() | date : 'MM/yyyy'" name="month"
+                                  (input)="dateLeaderChange($event,i)">
+                                <mat-datepicker-toggle matSuffix [for]="itemLeaderSalaryArea"></mat-datepicker-toggle>
+                                <mat-datepicker #itemLeaderSalaryArea [startView]="startView"
+                                  (monthSelected)="chosenMonthHandlerLeader($event, itemLeaderSalaryArea, i)" [disabled]="mblnChec"
+                                  (yearSelected)="chosenMonthHandlerLeader($event, itemLeaderSalaryArea, i)"
+                                  panelClass="example-month-picker">
+                                </mat-datepicker>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-1 d-flex justify-content-center">
+                            <a style="margin-bottom: -0.5rem !important;" href="javascript:void(0)"
+                              (click)="removeSalaryLeader(i)">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+        <div class="card-body">
+          <div class="form-group row align-items-center">
+            <label class="col-md-12"><h4>Lương nhân viên kinh doanh </h4></label>
+            <label class="col-md-1" style="padding-top: 20px;">Lương mục tiêu<span style="color: red;">&#42;</span></label>
+            <div class="col-md-5" style="padding-top: 20px;">
+              <mat-form-field class="example-full-width">
+                <input matInput [ngModel]="targetSalary | number:'1.0'" name="targetSalary" (ngModelChange)="targetSalary=$event"
+                     class="cvNumber" style="padding:0 .3rem" autocomplete="off" maxlength="10" (input)="checkSpecialEmployee($event)"/>
+              </mat-form-field>
+              <div *ngIf="preventSpace1" class="error-form25">
+                Lương mục tiêu phải là số nguyên lớn hơn 0
+              </div>
+              <div class="error-form25" *ngIf="special1">
+                {{'management.service.error.required' | translate}}
+              </div>
+            </div>
+
+            <div class="vis-card-header-custom leader-salary col-md-12" style="border-bottom: none;padding-top: 20px;">
+              <div class="row w-100">
+                <div class="col-md-3">
+                  <h5 style="margin-left: 0.3em;">Cấu hình lương mục tiêu theo thời gian</h5>
+                </div>
+                <div class="col-md-7 custom-control custom-checkbox">
+                  <input type="checkbox" name="checkEmployee" ngDefaultControl (change)="checkEmployeeForm($event)"/>
+                </div>
+                <div class="col-md-2 d-flex justify-content-center">
+                  <a href="javascript:void(0)" [(ngModel)]="addEmployee" name="addEmployee" ngDefaultControl *ngIf="addEmployee" (click)="addSalaryEmployee()" style="margin-left: 8.5em;">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <form [formGroup]="salaryEmployeeAreaForm" class="w-100">
+              <div formArrayName="itemEmployeeSalaryArea">
+                <div *ngFor="let items of salaryEmployeeAreaForm['controls'].itemEmployeeSalaryArea['controls']; let i = index;">
+                  <div class="col-md-12">
+                    <div class="card-target">
+                      <div [formGroupName]="i" class="card-body">
+                        <div class="form-group mb-3 row align-items-center">
+                          <label class="col-md-1" style="padding-left: 0;">Lương mục tiêu<span style="color: red;">&#42;</span></label>
+                            <div class="col-md-5">
+                              <mat-form-field>
+                                <input matInput  formControlName="salaryEmployeeArea" maxlength="10" (input)="checkEmployeeSalaryTime($event,i)">
+                              </mat-form-field>
+                              <div *ngIf="preventSpace3[i]" class="error-form25">
+                                Lương mục tiêu phải là số nguyên lớn hơn 0
+                              </div>
+                              <div class="error-form25" *ngIf="special3[i]">
+                                {{'management.service.error.required' | translate}}
+                              </div>
+                            </div>
+                            <label class="col-md-1">Tháng hết hạn </label>
+                            <div class="col-md-4">
+                              <small class="errorDate" *ngIf="isNullDate[i]">Dữ liệu không được để trống</small>
+                              <small class="errorDate" *ngIf="mblnCur[i]">Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại</small>
+                              <small class="errorDate" *ngIf="mblnvaLi[i]">{{'management.target.filter.validate' | translate}}</small>
+                              <small class="errorDate" *ngIf="yearOut[i] == true">{{'management.target.filter.yearOut' | translate}}</small>
+                              <mat-form-field class="font-text1">
+                                <input matInput #focus [matDatepicker]="dp" [formControl]="mdtDateSalaryEmployee[i]"
+                                        [readonly]="mblnChec"
+                                       (input)="dateEmployeeChange($event,i)" [hidden]=true [max]="mdtMaxDate" [min]="mdtMinDate">
+                                <input matInput [ngModelOptions]="{standalone: true}"
+                                [readonly]=true
+                                       [ngModel]="mdtDateSalaryEmployee[i].value._d.toString() | date : 'MM/yyyy'" name="month"
+                                       (input)="dateEmployeeChange($event,i)">
+                                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                                <mat-datepicker #dp [startView]="startView"
+                                                (monthSelected)="chosenMonthHandlerEmployee($event,dp,i)" [disabled]="mblnChec"
+                                                (yearSelected)="chosenMonthHandlerEmployee($event,dp,i)"
+                                                panelClass="example-month-picker">
+                                </mat-datepicker>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-1 d-flex justify-content-center">
+                            <a style="margin-bottom: -0.5rem !important;" href="javascript:void(0)"
+                              (click)="removeSalaryEmployee(i)">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="row">
+            <div class="col-md-12 d-flex justify-content-center flex-wrap">
+              <button class="btn btn-primary mb-2 mx-2 mt-4" (click)="confirmAd(comfirmAdd)"
+              [disabled]="btnsubmit || checkAll
+              ">Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #comfirmAdd>
+  <div class="modal-body pd-13">
+    <p style="margin:0px;" class=" d-flex align-middle "><i class="fa fa-question-circle text-primary"
+        style="font-size: 22px; padding-right: 10px"></i>
+      <span>Bạn có muốn lưu thay đổi cho cấu hình lương theo vùng không ?</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div mat-dialog-actions>
+      <button type="button" class="btn btn-secondary mr-1 click-btn" (click)="closeModal()">
+        <i class="fa fa-times"></i> {{'management.group.button.no' | translate}}
+      </button>
+      <button class="btn btn-primary ml-1 click-btn" (click)="onSubmit()">
+        <i class="fa fa-check"></i> {{'management.group.button.yes' | translate}}
+      </button>
+    </div>
+  </div>
+</ng-template>
+

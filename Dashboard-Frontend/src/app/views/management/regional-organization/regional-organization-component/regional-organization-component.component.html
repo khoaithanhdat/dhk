@@ -1,0 +1,22 @@
+<div class="w-100 staff-vds-cpn">
+  <div class="row">
+    <div class="col-md-3 d-flex no-pdr">
+      <div class="card w-100 no-mb">
+        <div class="vis-card-body">
+          <app-config-tree-vds-v2 [items]="nodeTreeViews" [config]="mobjConfigVDS"
+                                  [(value)]="valueVds" [types]="types" 
+                                  (valueChange)="unitChange($event)" style="padding: 0.35em;"
+                                  (filterChangeVDS)="searchTree($event)">
+          </app-config-tree-vds-v2>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-9 pdl-0 d-flex">
+      <area-manage-regional-organiztion *ngIf="screen === 'AREA'" class="col-md 12" [value]="manage_item" [children]="manage_children"></area-manage-regional-organiztion>
+      <partner-manage-regional-organiztion *ngIf="screen === 'PARTNER'" class="col-md 12" [value]="manage_item" [children]="manage_children"></partner-manage-regional-organiztion>
+      <lead-manage-regional-organiztion *ngIf="screen === 'LEAD'" class="col-md 12" [value]="manage_item" [children]="manage_children"></lead-manage-regional-organiztion>
+      <staff-manage-regional-organiztion *ngIf="screen === 'STAFF'" class="col-md 12" [value]="manage_item" [children]="manage_children"></staff-manage-regional-organiztion>
+    </div>
+  </div>
+</div>
+

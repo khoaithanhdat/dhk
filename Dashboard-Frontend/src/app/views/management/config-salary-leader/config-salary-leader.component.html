@@ -1,0 +1,815 @@
+<div class="card leader-layout">
+  <div class="row">
+    <div class="col-md-12 title">
+      <h2>Lương thực hiện chỉ tiêu</h2>
+    </div>
+    <div class="col-md-12">
+
+      <!-- cac chi tieu -->
+      <div class="row">
+        <div class="card">
+          <div class="vis-card-header-custom leader-salary">
+            <h5>{{'config_salary_leader.targets_title' | translate}}</h5>
+          </div>
+          <div class="card-body">
+            <div class="w-100 d-flex">
+              <button class="btn btn-info button-target" type="button"
+                (click)="addTarget()">{{'config_salary_leader.add_targets' | translate}}</button>
+            </div>
+            <div class="w-100 d-flex">
+              <form [formGroup]="targetForm" class="w-100">
+                <div formArrayName="itemsGlobal">
+                  <div *ngFor="let itemGolbal of targetForm['controls'].itemsGlobal['controls']; let i = index;">
+                    <div class="col-md-12">
+                      <div class="card-target">
+                        <div [formGroupName]="i" class="card-body">
+                          <div class="row">
+                            <div class="col-md-1 offset-md-11 d-flex justify-content-center">
+                              <a style="margin-right: 8px;" href="javascript:void(0)"
+                                (click)="removeTargetChild(itemGolbal, i)">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                              </a>
+                            </div>
+                          </div>
+                          <div class="card-body target-child">
+                            <div class="row">
+                              <label class="col-md-3 col-form-label fix-mr">Tên chỉ
+                                tiêu</label>
+                              <div class="col-md-8">
+                                <select name="select_target" class="fix-margin select-search"
+                                  formControlName="target_id" (change)="changeService(i)">
+                                  <option value="null">{{'management.service.form.choose' | translate}}</option>
+                                  <option *ngFor="let s of serviceModel" value="{{s.id}}">
+                                    {{s.name}}
+                                  </option>
+                                </select>
+                                <mat-error
+                                  *ngIf="(submited || itemsGlobal.controls[i].get('target_id').dirty) && itemsGlobal.controls[i].get('target_id').errors?.pattern">
+                                  Phải chọn tên chỉ tiêu
+                                </mat-error>
+                                <mat-error *ngIf="checkDuplicateServiceId[i]">
+                                  Đang có 2 chỉ tiêu trùng nhau. Vui lòng chọn lại
+                                </mat-error>
+                              </div>
+                              <div class="col-md-1 d-flex justify-content-center align-items-center">
+                                <a href="javascript:void(0)" (click)="addTargetChild(i)">
+                                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                </a>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div formArrayName="items" class="col-md-12">
+                                <div *ngFor="let item of itemGolbal['controls'].items['controls']; let j = index;">
+                                  <div [formGroupName]="j">
+                                    <div class="form-group mb-3 row align-items-center">
+                                      <label class="col-md-3 fix-label">Mức hoàn
+                                        thành(%)</label>
+                                      <div class="col-md-1">
+                                        <select name="select_targetChild" class="fix-margin select-search"
+                                          (change)="comparisonChange(i,j)" formControlName="comparison">
+                                          <option value="null">{{'management.target.combobox.all' | translate}}</option>
+                                          <option *ngFor="let c of comparisonDefault" value="{{c.value}}">{{c.name}}
+                                          </option>
+                                        </select>
+                                        <div class="mat-error">
+                                          <mat-error class="ellipsis" tooltip="Phải chọn mức hoàn thành" placement="top"
+                                            (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison').dirty) && itemsGlobal.controls[i].get('items.'+j+'.comparison').errors?.pattern">
+                                            Phải chọn mức hoàn thành
+                                          </mat-error>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-1">
+                                        <mat-form-field class="w-100">
+                                          <input matInput formControlName="comparison_value_from"
+                                            (input)="validValueTo(0, i, j)" maxlength="5">
+                                        </mat-form-field>
+                                        <div class="mat-error">
+                                          <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống"
+                                            placement="top" (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').dirty || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').touched) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').errors?.required">
+                                            Dữ liệu không được để trống
+                                          </mat-error>
+                                          <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                            (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').dirty || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').touched) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').errors?.maxlength">
+                                            Tối đa 5 kí tự số
+                                          </mat-error>
+                                          <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số"
+                                            placement="top" (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').dirty || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').touched) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value_from').errors?.pattern">
+                                            Chỉ được nhập kí tự là số
+                                          </mat-error>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-1">
+                                        <div class="div" *ngIf="checkComparison[i][j]">
+                                          <mat-form-field class="w-100">
+                                            <input matInput class="" formControlName="comparison_value_to"
+                                              (input)="validValueTo(0, i, j)" maxlength="5">
+                                          </mat-form-field>
+                                          <div class="mat-error">
+                                            <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống"
+                                              placement="top" (mousemove)="noMethod()"
+                                              *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').dirty || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').touched) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').errors?.required">
+                                              Dữ liệu không được để trống
+                                            </mat-error>
+                                            <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                              (mousemove)="noMethod()"
+                                              *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').dirty || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').touched) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').errors?.maxlength">
+                                              Tối đa 5 kí tự số
+                                            </mat-error>
+                                            <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số"
+                                              placement="top" (mousemove)="noMethod()"
+                                              *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').dirty || itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').touched) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value_to').errors?.pattern">
+                                              Chỉ được nhập kí tự là số
+                                            </mat-error>
+                                            <mat-error class="ellipsis" tooltip="Giá trị cuối phải lớn hơn giá trị đầu"
+                                              placement="top" (mousemove)="noMethod()"
+                                              *ngIf="checkValueToTargetForm[i] && checkValueToTargetForm[i][j]">
+                                              Giá trị cuối phải lớn hơn giá trị đầu
+                                            </mat-error>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <label class="col-md-1 fix-label">Giá
+                                        trị(%)</label>
+                                      <div class="col-md-1">
+                                        <mat-form-field class="w-100">
+                                          <input matInput formControlName="comparison_value" maxlength="5">
+                                        </mat-form-field>
+                                        <div class="mat-error">
+                                          <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống"
+                                            placement="top" (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value').touched || itemsGlobal.controls[i].get('items.'+j+'.comparison_value').dirty) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value').errors?.required">
+                                            Dữ liệu không được để trống
+                                          </mat-error>
+                                          <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                            (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value').touched || itemsGlobal.controls[i].get('items.'+j+'.comparison_value').dirty) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value').errors?.maxlength">
+                                            Tối đa 5 kí tự số
+                                          </mat-error>
+                                          <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số"
+                                            placement="top" (mousemove)="noMethod()"
+                                            *ngIf="(submited || itemsGlobal.controls[i].get('items.'+j+'.comparison_value').touched || itemsGlobal.controls[i].get('items.'+j+'.comparison_value').dirty) && itemsGlobal.controls[i].get('items.'+j+'.comparison_value').errors?.pattern">
+                                            Chỉ được nhập kí tự là số
+                                          </mat-error>
+                                        </div>
+                                      </div>
+                                      <label class="col-md-1 p-0 fix-label">Tháng hết
+                                        hạn</label>
+                                      <div class="col-md-2">
+                                        <mat-form-field class="w-100" style="text-align: center;">
+                                          <input matInput #focus [matDatepicker]="dp" formControlName="expired_month"
+                                            placeholder="{{mdtDate[i][j] && mdtDate[i][j].value ? '' : 'MM/YYYY'}}"
+                                            [formControl]="mdtDate[i] && mdtDate[i][j] ? mdtDate[i][j] : null"
+                                            [readonly]="mblnChec"
+                                            (dateChange)="dateChange($event, i, j)" [hidden]=true [max]="mdtMaxDate"
+                                            [min]="mdtMinDate">
+                                          <input matInput *ngIf="mdtDate[i] && mdtDate[i][j] && mdtDate[i][j].value && mdtDate[i][j].value._d"
+                                            [ngModelOptions]="{standalone: true}"
+                                            [ngModel]="mdtDate[i][j].value._d.toString() | date : 'MM/yyyy'"
+                                            name="month" (change)="dateChange($event, i, j)">
+                                          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                                          <mat-datepicker #dp [startView]="startView"
+                                            (monthSelected)="chosenMonthHandler($event, dp, i, j)" [disabled]="mblnChec"
+                                            (yearSelected)="chosenMonthHandler($event, dp, i, j)"
+                                            panelClass="example-month-picker">
+                                          </mat-datepicker>
+                                        </mat-form-field>
+                                        <div class="mat-error" *ngIf="submited && checkMonthTarget[i][j]">
+                                          <mat-error class="ellipsis" tooltip="Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại"
+                                            placement="top" (mousemove)="noMethod()"
+                                            *ngIf="checkMonthTarget[i][j]">
+                                            Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại
+                                          </mat-error>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-1 d-flex justify-content-center">
+                                        <a style="margin-bottom: -1rem !important;" href="javascript:void(0)"
+                                          (click)="removeItems(item, i, j)">
+                                          <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ti le hoan thanh tong cac chi tieu -->
+      <div class="row">
+        <div class="card">
+          <div class="vis-card-header-custom leader-salary">
+            <div class="row w-100">
+              <div class="col-md-10">
+                <h5 style="margin-left: 1em;">Tỷ lệ hoàn thành tổng các chỉ tiêu</h5>
+              </div>
+              <div class="col-md-2 d-flex justify-content-center align-items-center">
+                <a href="javascript:void(0)" (click)="addTargetComplete()" style="margin-left: 2.8rem;">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <form [formGroup]="targetCompleteForm" class="w-100">
+            <div class="w-100 d-flex">
+              <div formArrayName="itemsComplete" class="w-100">
+                <div
+                  *ngFor="let itemComplete of targetCompleteForm['controls'].itemsComplete['controls']; let i = index;">
+                  <div class="col-md-12">
+                    <div class="card-target">
+                      <div [formGroupName]="i" class="card-body">
+                        <div class="form-group mb-3 row align-items-center">
+                          <label class="col-md-3 fix-label">Mức hoàn
+                            thành(%)</label>
+                          <div class="col-md-1">
+                            <select name="select_targetChild" class="fix-margin select-search"
+                              (change)="comparisonCompleteChange(i)" formControlName="comparison_complete">
+                              <option value="null">{{'management.target.combobox.all' | translate}}</option>
+                              <option *ngFor="let c of comparisonDefault" value="{{c.value}}">{{c.name}}</option>
+                            </select>
+                            <div class="mat-error">
+                              <mat-error class="ellipsis" tooltip="Phải chọn mức hoàn thành" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || itemsComplete.controls[i].get('comparison_complete').dirty) && itemsComplete.controls[i].get('comparison_complete').errors?.pattern">
+                                Phải chọn mức hoàn thành
+                              </mat-error>
+                            </div>
+                          </div>
+                          <div class="col-md-1">
+                            <mat-form-field class="w-100">
+                              <input matInput formControlName="comparison_value_from_complete" maxlength="5"
+                                (input)="validValueTo(1, i)">
+                            </mat-form-field>
+                            <div class="mat-error">
+                              <mat-error class="ellipsis" tooltip="Không được để trống" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_from_complete').touched || itemsComplete.controls[i].get('comparison_value_from_complete').dirty) && itemsComplete.controls[i].get('comparison_value_from_complete').errors?.required">
+                                Không được để trống
+                              </mat-error>
+                              <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_from_complete').touched ||  itemsComplete.controls[i].get('comparison_value_from_complete').dirty) && itemsComplete.controls[i].get('comparison_value_from_complete').errors?.maxlength">
+                                Tối đa 5 kí tự số
+                              </mat-error>
+                              <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_from_complete').touched ||  itemsComplete.controls[i].get('comparison_value_from_complete').dirty) && itemsComplete.controls[i].get('comparison_value_from_complete').errors?.pattern">
+                                Chỉ được nhập kí tự là số
+                              </mat-error>
+                            </div>
+                          </div>
+                          <div class="col-md-1">
+                            <div class="w-100" *ngIf="checkComparisonComplete[i]">
+                              <mat-form-field class="w-100">
+                                <input matInput formControlName="comparison_value_to_complete" maxlength="5"
+                                  (input)="validValueTo(1, i)">
+                              </mat-form-field>
+                              <div class="mat-error">
+                                <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                                  (mousemove)="noMethod()"
+                                  *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_to_complete').touched || itemsComplete.controls[i].get('comparison_value_to_complete').dirty) && itemsComplete.controls[i].get('comparison_value_to_complete').errors?.required">
+                                  Dữ liệu không được để trống
+                                </mat-error>
+                                <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                  (mousemove)="noMethod()"
+                                  *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_to_complete').touched ||  itemsComplete.controls[i].get('comparison_value_to_complete').dirty) && itemsComplete.controls[i].get('comparison_value_to_complete').errors?.maxlength">
+                                  Tối đa 5 kí tự số
+                                </mat-error>
+                                <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                                  (mousemove)="noMethod()"
+                                  *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_to_complete').touched ||  itemsComplete.controls[i].get('comparison_value_to_complete').dirty) && itemsComplete.controls[i].get('comparison_value_to_complete').errors?.pattern">
+                                  Chỉ được nhập kí tự là số
+                                </mat-error>
+                                <mat-error class="ellipsis" tooltip="Giá trị cuối phải lớn hơn giá trị đầu"
+                                  placement="top" (mousemove)="noMethod()" *ngIf="checkValueToCompleteForm[i]">
+                                  Giá trị cuối phải lớn hơn giá trị đầu
+                                </mat-error>
+                              </div>
+                            </div>
+                          </div>
+
+                          <label class="col-md-1 fix-label">
+                            Giá trị(%)</label>
+
+                          <div class="col-md-1">
+                            <mat-form-field class="w-100">
+                              <input matInput formControlName="comparison_value_complete">
+                            </mat-form-field>
+                            <mat-error class="ellipsis" tooltip="Không được để trống" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_complete').touched || itemsComplete.controls[i].get('comparison_value_complete').dirty) && itemsComplete.controls[i].get('comparison_value_complete').errors?.required">
+                              Không được để trống
+                            </mat-error>
+                            <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_complete').touched ||  itemsComplete.controls[i].get('comparison_value_complete').dirty) && itemsComplete.controls[i].get('comparison_value_complete').errors?.maxlength">
+                              Tối đa 5 kí tự số
+                            </mat-error>
+                            <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || itemsComplete.controls[i].get('comparison_value_complete').touched ||  itemsComplete.controls[i].get('comparison_value_complete').dirty) && itemsComplete.controls[i].get('comparison_value_complete').errors?.pattern">
+                              Chỉ được nhập kí tự là số
+                            </mat-error>
+                          </div>
+
+                          <label class="col-md-1 p-0 fix-label">Tháng hết
+                            hạn</label>
+
+                          <div class="col-md-2">
+                            <mat-form-field class="w-100" style="text-align: center;">
+                              <input matInput #focus [matDatepicker]="dp"
+                                placeholder="{{mdtDateComplete[i] && mdtDateComplete[i].value ? '' : 'MM/YYYY'}}"
+                                [formControl]="mdtDateComplete[i] ? mdtDateComplete[i] : null" [readonly]="mblnChec"
+                                (dateChange)="dateChangeComplete($event, i)" [hidden]=true [max]="mdtMaxDate"
+                                [min]="mdtMinDate">
+                              <input matInput *ngIf="mdtDateComplete[i] && mdtDateComplete[i].value && mdtDateComplete[i].value._d" [ngModelOptions]="{standalone: true}"
+                                [ngModel]="mdtDateComplete[i].value._d.toString() | date : 'MM/yyyy'" name="month"
+                                (change)="dateChangeComplete($event, i)">
+                              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                              <mat-datepicker #dp [startView]="startView"
+                                (monthSelected)="chosenMonthHandlerComplete($event, dp, i)" [disabled]="mblnChec"
+                                (yearSelected)="chosenMonthHandlerComplete($event, dp, i)"
+                                panelClass="example-month-picker">
+                              </mat-datepicker>
+                            </mat-form-field>
+                            <div class="mat-error" *ngIf="submited && checkMonthComplete[i]">
+                              <mat-error class="ellipsis" tooltip="Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại"
+                                placement="top" (mousemove)="noMethod()"
+                                *ngIf="checkMonthComplete[i]">
+                                Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại
+                              </mat-error>
+                            </div>
+                          </div>
+
+                          <div class="col-md-1 d-flex justify-content-center">
+                            <a style="margin-bottom: -1rem !important;" href="javascript:void(0)"
+                              (click)="removeItemComplete(itemComplete, i)">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- he so tinh luong -->
+      <div class="row">
+        <div class="card">
+          <div class="vis-card-header-custom leader-salary">
+            <div class="row w-100">
+              <div class="col-md-10">
+                <h5 style="margin-left: 1em;">Hệ số tính lương</h5>
+              </div>
+              <div class="col-md-2 d-flex justify-content-center align-items-center">
+                <a href="javascript:void(0)" (click)="addSalaryCoefficient()" style="margin-left: 2.8rem;">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <form [formGroup]="salaryCoefficientForm" class="w-100">
+            <div class="w-100">
+              <div formArrayName="coefficient">
+                <div *ngFor="let c of salaryCoefficientForm['controls'].coefficient['controls']; let i = index;">
+                  <div class="col-md-12">
+                    <div class="card-target">
+                      <div [formGroupName]="i" class="card-body">
+                        <div class="form-group mb-3 row align-items-center">
+                          <label class="col-md-2 fix-label">Tỉ lệ
+                            hoàn thành(%)</label>
+                          <div class="col-md-1">
+                            <select name="select_targetChild" class="fix-margin select-search"
+                              (change)="comparisonCoefficientChange(i)" formControlName="comparison_coefficient">
+                              <option value="null">{{'management.target.combobox.all' | translate}}</option>
+                              <option *ngFor="let c of comparisonDefault" value="{{c.value}}">{{c.name}}</option>
+                            </select>
+                            <mat-error class="ellipsis" tooltip="Phải chọn mức hoàn thành" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || coefficient.controls[i].get('comparison_coefficient').dirty) && coefficient.controls[i].get('comparison_coefficient').errors?.pattern">
+                              Phải chọn mức hoàn thành
+                            </mat-error>
+                          </div>
+                          <div class="col-md-1">
+                            <mat-form-field class="w-100">
+                              <input matInput formControlName="comparison_value_from_coefficient"
+                                (input)="validValueTo(2, i)" maxlength="5">
+                            </mat-form-field>
+                            <div class="mat-error">
+                              <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || coefficient.controls[i].get('comparison_value_from_coefficient').touched || coefficient.controls[i].get('comparison_value_from_coefficient').dirty) && coefficient.controls[i].get('comparison_value_from_coefficient').errors?.required">
+                                Dữ liệu không được để trống
+                              </mat-error>
+                              <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || coefficient.controls[i].get('comparison_value_from_coefficient').touched ||  coefficient.controls[i].get('comparison_value_from_coefficient').dirty) && coefficient.controls[i].get('comparison_value_from_coefficient').errors?.maxlength">
+                                Tối đa 5 kí tự số
+                              </mat-error>
+                              <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="(submited || coefficient.controls[i].get('comparison_value_from_coefficient').touched ||  coefficient.controls[i].get('comparison_value_from_coefficient').dirty) && coefficient.controls[i].get('comparison_value_from_coefficient').errors?.pattern">
+                                Chỉ được nhập kí tự là số
+                              </mat-error>
+                            </div>
+                          </div>
+                          <div class="col-md-1">
+                            <div class="w-100" *ngIf="checkComparisonCoefficient[i]">
+                              <mat-form-field class="w-100">
+                                <input matInput formControlName="comparison_value_to_coefficient" maxlength="5"
+                                  (input)="validValueTo(2, i)">
+                              </mat-form-field>
+                              <div class="mat-error">
+                                <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                                  (mousemove)="noMethod()"
+                                  *ngIf="(submited || coefficient.controls[i].get('comparison_value_to_coefficient').touched || coefficient.controls[i].get('comparison_value_to_coefficient').dirty) && coefficient.controls[i].get('comparison_value_to_coefficient').errors?.required">
+                                  Dữ liệu không được để trống
+                                </mat-error>
+                                <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                  (mousemove)="noMethod()"
+                                  *ngIf="(submited || coefficient.controls[i].get('comparison_value_to_coefficient').touched || coefficient.controls[i].get('comparison_value_to_coefficient').dirty) && coefficient.controls[i].get('comparison_value_to_coefficient').errors?.maxlength">
+                                  Tối đa 5 kí tự số
+                                </mat-error>
+                                <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                                  (mousemove)="noMethod()"
+                                  *ngIf="(submited || coefficient.controls[i].get('comparison_value_to_coefficient').touched || coefficient.controls[i].get('comparison_value_to_coefficient').dirty) && coefficient.controls[i].get('comparison_value_to_coefficient').errors?.pattern">
+                                  Chỉ được nhập kí tự là số
+                                </mat-error>
+                                <mat-error class="ellipsis" tooltip="Giá trị cuối phải lớn hơn giá trị đầu"
+                                  placement="top" (mousemove)="noMethod()" *ngIf="checkValueToCoefficientForm[i]">
+                                  Giá trị cuối phải lớn hơn giá trị đầu
+                                </mat-error>
+                              </div>
+                            </div>
+                          </div>
+
+                          <label class="col-md-1 fix-label">
+                            Giá trị</label>
+
+                          <div class="col-md-1">
+                            <select name="select_targetChild" class="fix-margin select-search"
+                              formControlName="value_type_coefficient" (change)="changeFormula(i)">
+                              <option *ngFor="let f of formula" value="{{f.value}}">{{f.name}}</option>
+                            </select>
+                            <div class="mat-error">
+                              <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                                (mousemove)="noMethod()"
+                                *ngIf="submited && coefficient.controls[i].get('value_type_coefficient').errors?.pattern">
+                                Dữ liệu không được để trống
+                              </mat-error>
+                            </div>
+                          </div>
+                          <div class="col-md-1">
+                            <div class="w-100">
+                              <div class="w-100" *ngIf="checkFormula[i] == 0">
+                                <mat-form-field class="w-100">
+                                  <input matInput formControlName="comparison_value_coefficient" maxlength="5">
+                                </mat-form-field>
+                                <div class="mat-error">
+                                  <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                                    (mousemove)="noMethod()"
+                                    *ngIf="(submited || coefficient.controls[i].get('comparison_value_coefficient').touched || coefficient.controls[i].get('comparison_value_coefficient').dirty) && coefficient.controls[i].get('comparison_value_coefficient').errors?.required">
+                                    Dữ liệu không được để trống
+                                  </mat-error>
+                                  <mat-error class="ellipsis" tooltip="Tối đa 5 kí tự số" placement="top"
+                                    (mousemove)="noMethod()"
+                                    *ngIf="(submited || coefficient.controls[i].get('comparison_value_coefficient').touched || coefficient.controls[i].get('comparison_value_coefficient').dirty) && coefficient.controls[i].get('comparison_value_coefficient').errors?.maxlength">
+                                    Tối đa 5 kí tự số
+                                  </mat-error>
+                                  <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                                    (mousemove)="noMethod()"
+                                    *ngIf="(submited || coefficient.controls[i].get('comparison_value_coefficient').touched || coefficient.controls[i].get('comparison_value_coefficient').dirty) && coefficient.controls[i].get('comparison_value_coefficient').errors?.pattern">
+                                    Chỉ được nhập kí tự là số
+                                  </mat-error>
+                                </div>
+                              </div>
+                              <div class="w-100" *ngIf="checkFormula[i] == 1">
+                                <a style="margin-bottom: -1rem !important;" href="javascript:void(0)"
+                                  (click)="editFormulaCoefficient(i, template)">
+                                  <i class="fa fa-pencil-square" aria-hidden="true"></i>
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+
+                          <label class="col-md-1 p-0 fix-label">Tháng hết
+                            hạn</label>
+
+                          <div class="col-md-2">
+                            <mat-form-field class="w-100" style="text-align: center;">
+                              <input matInput #focus [matDatepicker]="dp"
+                                placeholder="{{mdtDateCoefficient[i] && mdtDateCoefficient[i].value ? '' : 'MM/YYYY'}}"
+                                [formControl]="mdtDateCoefficient[i] ? mdtDateCoefficient[i] : null" [readonly]="mblnChec"
+                                (dateChange)="dateChangeCoefficient($event, i)" [hidden]=true [max]="mdtMaxDate"
+                                [min]="mdtMinDate">
+                              <input matInput *ngIf="mdtDateCoefficient[i] && mdtDateCoefficient[i].value && mdtDateCoefficient[i].value._d"
+                                [ngModelOptions]="{standalone: true}"
+                                [ngModel]="mdtDateCoefficient[i].value._d.toString() | date : 'MM/yyyy'" name="month"
+                                (change)="dateChangeCoefficient($event, i)">
+                              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                              <mat-datepicker #dp [startView]="startView"
+                                (monthSelected)="chosenMonthHandlerCoefficient($event, dp, i)" [disabled]="mblnChec"
+                                (yearSelected)="chosenMonthHandlerCoefficient($event, dp, i)"
+                                panelClass="example-month-picker">
+                              </mat-datepicker>
+                            </mat-form-field>
+                            <div class="mat-error" *ngIf="submited && checkMonthCoefficient[i]">
+                              <mat-error class="ellipsis" tooltip="Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại"
+                                placement="top" (mousemove)="noMethod()"
+                                *ngIf="checkMonthCoefficient[i]">
+                                Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại
+                              </mat-error>
+                            </div>
+                          </div>
+
+                          <div class="col-md-1 d-flex justify-content-center">
+                            <a style="margin-bottom: -1rem !important;" href="javascript:void(0)"
+                              (click)="removeSalaryCoefficient(c, i)">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- phi ban hang -->
+  <div class="row">
+    <div class="col-md-12 title">
+      <h2>Phí bán hàng</h2>
+    </div>
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-target">
+            <div class="row mt-3 mb-3 align-items-center">
+
+              <label class="col-md-1 fix-label">Tên phí: </label>
+              <div class="col-md-3">
+                <mat-form-field class="w-100">
+                  <input matInput [(ngModel)]="valueFeeSearch">
+                </mat-form-field>
+              </div>
+
+              <label class="col-md-2 fix-label">Đối tượng hưởng</label>
+              <div class="col-md-3">
+                <select name="select_target" class="fix-margin select-search" (change)="getReceiveFeeSearch()"
+                  [(ngModel)]="receiveSearch">
+                  <option value="null">{{'management.service.form.choose' | translate}}</option>
+                  <option *ngFor="let r of receiveFee" value="{{r.value}}">{{r.name}}</option>
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <button class="btn btn-info pull-right" type="button" (click)="searchFee()">Tìm kiếm</button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-9"></div>
+              <div class="col-md-3 mb-3">
+                <button class="btn btn-info pull-right" type="button" (click)="addFee()">Thêm mới</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-target">
+            <form [formGroup]="feeForm">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover ng-untouched ng-pristine ng-valid table-sm">
+                  <thead class="header-table">
+                    <tr style="text-align: center">
+                      <th scope="col">STT</th>
+                      <th scope="col">Tên phí</th>
+                      <th scope="col">Đối tượng hưởng</th>
+                      <th scope="col">% hưởng</th>
+                      <th scope="col">Tháng hết hạn</th>
+                      <th scope="col">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-container formArrayName="fees"
+                      *ngFor="let feeForm of feeForm['controls'].fees['controls'] | paginate: { id: 'fees', itemsPerPage: pageSize, currentPage: currentPage}; let i = index;">
+                      <tr [formGroupName]="fieldGlobalIndex(i)">
+                        <td scope="row" style="text-align: center;">{{currentPage * pageSize - (pageSize - 1) + i}}</td>
+                        <td scope="row" style="text-align: center;">
+                          <select name="select_target" class="fix-margin select-search" (change)="feeIdChange(i)"
+                            style="max-height: 40px; background: none;" formControlName="fee_id">
+                            <option value="null">{{'management.service.form.choose' | translate}}</option>
+                            <option *ngFor="let f of saleFeeModel" value="{{f.id}}">{{f.name}}</option>
+                          </select>
+                          <div class=mat-error>
+                            <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || fees.controls[i].get('fee_id').dirty) && fees.controls[i].get('fee_id').errors?.pattern">
+                              Dữ liệu không được để trống
+                            </mat-error>
+                            <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                              (mousemove)="noMethod()" *ngIf="checkDuplicateFeeId[i]">
+                              Đang cấu hình trùng phí bán hàng. Vui lòng chọn lại
+                            </mat-error>
+                          </div>
+                        </td>
+                        <td scope="row" style="text-align: center;">
+                          <select formControlName="receive_from_fee" class="fix-margin select-search"
+                            style="max-height: 40px; background: none;" (change)="feeReceiveChange(i)">
+                            <option value="null">{{'management.service.form.choose' | translate}}</option>
+                            <option *ngFor="let r of receiveFee" value="{{r.value}}">{{r.name}}</option>
+                          </select>
+                          <div class="mat-error">
+                            <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || fees.controls[i].get('receive_from_fee').dirty) && fees.controls[i].get('receive_from_fee').errors?.pattern">
+                              Dữ liệu không được để trống
+                            </mat-error>
+                          </div>
+                        </td>
+                        <td scope="row" style="text-align: center;">
+                          <mat-form-field>
+                            <input matInput formControlName="receive_percent_fee" (input)="changePercentSaleFee(i)">
+                          </mat-form-field>
+                          <div class="mat-error">
+                            <mat-error class="ellipsis" tooltip="Dữ liệu không được để trống" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || fees.controls[i].get('receive_percent_fee').touched || fees.controls[i].get('receive_percent_fee').dirty) && fees.controls[i].get('receive_percent_fee').errors?.required">
+                              Dữ liệu không được để trống
+                            </mat-error>
+                            <mat-error class="ellipsis" tooltip="Chỉ được nhập kí tự là số" placement="top"
+                              (mousemove)="noMethod()"
+                              *ngIf="(submited || fees.controls[i].get('receive_percent_fee').touched || fees.controls[i].get('receive_percent_fee').dirty) && fees.controls[i].get('receive_percent_fee').errors?.pattern">
+                              Chỉ được nhập kí tự là số
+                            </mat-error>
+                          </div>
+                        </td>
+                        <td scope="row" style="text-align: center;">
+                          <mat-form-field class="w-100" style="text-align: center;">
+                            <input matInput #focus [matDatepicker]="dp"
+                              placeholder="{{mdtDateSaleFee[i] && mdtDateSaleFee[i].value ? '' : 'MM/YYYY'}}"
+                              [formControl]="mdtDateSaleFee[i] ? mdtDateSaleFee[i] : null" [readonly]="mblnChec"
+                              (dateChange)="dateChangeSaleFee($event, i)" [hidden]=true [max]="mdtMaxDate"
+                              [min]="mdtMinDate">
+                            <input matInput *ngIf="mdtDateSaleFee[i] && mdtDateSaleFee[i].value && mdtDateSaleFee[i].value._d"
+                              [ngModelOptions]="{standalone: true}"
+                              [ngModel]="mdtDateSaleFee[i].value._d.toString() | date : 'MM/yyyy'" name="month"
+                              (change)="dateChangeSaleFee($event, i)">
+                            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                            <mat-datepicker #dp [startView]="startView"
+                              (monthSelected)="chosenMonthHandlerSaleFee($event, dp, i)" [disabled]="mblnChec"
+                              (yearSelected)="chosenMonthHandlerSaleFee($event, dp, i)"
+                              panelClass="example-month-picker">
+                            </mat-datepicker>
+                          </mat-form-field>
+                          <div class="mat-error" *ngIf="submited && checkMonthSaleFee[i]">
+                            <mat-error class="ellipsis" tooltip="Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại"
+                              placement="top" (mousemove)="noMethod()"
+                              *ngIf="checkMonthSaleFee[i]">
+                              Tháng hết hạn phải lớn hơn hoặc bằng tháng hiện tại
+                            </mat-error>
+                          </div>
+                        </td>
+                        <td scope="row" style="text-align: center;">
+                          <a style="margin-bottom: -1rem !important;" href="javascript:void(0)"
+                            (click)="removeFee(feeForm, i)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+            <pagination-controls style="float: right;" id="fees" (pageChange)="currentPage = $event" maxSize="5"
+              directionLinks="true" autoHide="false" responsive="false"
+              previousLabel="{{'management.target.table.pager.previous' | translate}}"
+              nextLabel="{{'management.target.table.pager.next' | translate}}" screenReaderPaginationLabel="Pagination"
+              screenReaderPageLabel="page" screenReaderCurrentLabel="You're on page">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row align-self-center">
+    <button class="btn btn-info" type="button" (click)="onSubmit()" 
+    [disabled]="targetForm.invalid || targetCompleteForm.invalid || salaryCoefficientForm.invalid || feeForm.invalid">Lưu</button>
+  </div>
+</div>
+
+
+
+<!-- modal he so tinh luong -->
+<ng-template #template #index>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Công thức tính</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <textarea [(ngModel)]="formulaValue" class="w-100" (input)="checkChangeFormula()"></textarea>
+    <mat-error>{{checkFormulaValue}}</mat-error>
+    <mat-error>{{checkFormulaValueRegex}}</mat-error>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="getFormula()" [disabled]="!checkChangeFormulaValue || formulaValue==''">Sửa</button>
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">Đóng</button>
+  </div>
+</ng-template>
+
+<!-- modal alert overleft error -->
+<ng-template #overleft>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Có lỗi xảy ra</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeOverleftModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <mat-error *ngFor="let col of checkOverLeft">
+      <h4>Các khoảng điều kiện không được chồng lên nhau. Vui lòng chọn lại</h4>
+      <div class="border-bottom" *ngIf="col.serviceName == 0">
+        <div class="content">
+          Tỷ lệ hoàn thành tổng các chỉ tiêu - {{col.month | date : 'MM/yyyy'}}
+        </div>
+      </div>
+      <div class="border-bottom" *ngIf="col.serviceName == 'null'">
+        <div class="content">
+          Hệ số tính lương - {{col.month | date : 'MM/yyyy'}}
+        </div>
+      </div>
+      <div class="border-bottom" *ngIf="col.serviceName != 'null' && col.serviceName != 0">
+        <div class="content">
+          {{col.serviceName}} - {{col.month | date : 'MM/yyyy'}}
+        </div>
+      </div>
+    </mat-error>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeOverleftModal()">Đóng</button>
+  </div>
+</ng-template>
+
+<!-- modal confirm change value sale feee -->
+<ng-template #confirmSearchSaleFee>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Xác nhận</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="rejectSearch()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    Thông tin vừa thay đổi sẽ bị mất nếu tìm kiếm. Bạn có muốn tiếp tục không?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="confirmSearch()">Tiếp tục</button>
+    <button type="button" class="btn btn-secondary" (click)="rejectSearch()">Không</button>
+  </div>
+</ng-template>
+
+<!-- modal confirm global -->
+<ng-template #confirmGlobal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Xác nhận</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="reject()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    Bạn có chắc muốn {{titleAction}}?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="accept()">Đồng ý</button>
+    <button type="button" class="btn btn-secondary" (click)="reject()">Không</button>
+  </div>
+</ng-template>

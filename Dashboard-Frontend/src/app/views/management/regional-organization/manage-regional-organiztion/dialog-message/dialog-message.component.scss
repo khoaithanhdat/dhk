@@ -1,0 +1,8 @@
+.messageDialog {
+  &:first-child{
+    color: green;
+  }
+  &:last-child{
+    color: red;
+  }
+}

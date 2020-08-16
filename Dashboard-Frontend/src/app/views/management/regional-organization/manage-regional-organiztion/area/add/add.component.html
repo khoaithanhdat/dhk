@@ -1,0 +1,104 @@
+<div class="vis-card-header-declare">
+  <h5 class="pb-1">Thêm mới Viettel Tỉnh</h5>
+  <span (click)="onClose()" style="cursor: pointer"><i class="fa fa-times"></i></span>
+</div>
+<div class="card no-mb w-100 border-0 mt-2">
+
+  <div class="vis-card-body">
+    <div class="container">
+      <div class="form-group row my-2">
+        <label class="col-md-3 d-flex align-items-center" for="">
+          Chọn tỉnh <span style="color: red">*</span>
+        </label>
+        <div class="col-md-9">
+          <ng-multiselect-dropdown
+            [data]="dropdownList"
+            [settings]="dropdownSettings"
+            (onSelect)="onItemSelect($event)"
+            (onSelectAll)="onSelectAll($event)"
+            (onDeSelect)="onDeSelect($event)"
+            (onDeSelectAll)="onDeSelectAll($event)"
+          >
+          </ng-multiselect-dropdown>
+          <small class="validate-red" *ngIf="validateProvice">
+            chưa chọn tỉnh
+          </small>
+        </div>
+      </div>
+      <div class="form-group row my-2">
+        <label class="col-md-3 d-flex align-items-center" for="">
+          Ngày hết hạn
+        </label>
+        <div class="col-md-4">
+          <mat-form-field appearance="fill">
+            <input matInput [matDatepicker]="fromDate" [(ngModel)]="expiredDate" (dateChange)="dateChangeTo($event)">
+            <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
+            <mat-datepicker #fromDate></mat-datepicker>
+          </mat-form-field>
+          <small style="margin-top: -.8rem;" class="d-block validate-red" *ngIf="dateToInvalid">
+            {{'management.weight.invalidDate' | translate}}
+          </small>
+          <small style="margin-top: -.8rem;" class="d-block validate-red" *ngIf="dateMoreFrom">
+           Ngày hết hạn không được nhỏ hơn ngày hiện tại
+          </small>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="w-100 d-flex justify-content-center pt-2 mt-1">
+          <button class="btn btn-primary btn-click mb-2 mx-2" (click)="onClose()"><i class="fa fa-times"></i>
+            {{'management.service.button.cancel' | translate}}
+          </button>
+          <button class="btn btn-primary btn-click mb-2 mx-2" (click)="confirmAd(comfirmAdd)" [disabled]="disbleButton">
+            <i class="fa fa-save"></i> {{'management.service.button.save' | translate}}
+          </button>
+        </div>
+      </div>
+      <!--<div class="row mt-3">-->
+      <!--<div class="col-md-2 offset-md-4">-->
+      <!--<div class="button-group py-2">-->
+      <!--<button class="btn btn-primary w-100" (click)="onSave()">Thêm mới</button>-->
+      <!--</div>-->
+      <!--</div>-->
+      <!--<div class="col-md-2 ">-->
+      <!--<div class="button-group py-2">-->
+      <!--<button class="btn btn-primary w-100" (click)="onClose()">Hủy</button>-->
+      <!--</div>-->
+      <!--</div>-->
+      <!--</div>-->
+    </div>
+  </div>
+</div>
+<ng-template #comfirmAdd>
+  <div class="modal-body pd-13">
+    <p style="margin:0px;" class=" d-flex align-middle "><i class="fa fa-question-circle text-primary"
+                                                            style="font-size: 22px; padding-right: 10px"></i> <span
+      *ngIf="!dsb">{{'management.group.message.addnew' | translate}}</span>
+      <span *ngIf="dsb">{{'management.group.message.addnew' | translate}}</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div mat-dialog-actions>
+      <button type="button" class="btn btn-secondary mr-1 click-btn" (click)="closeModal()">
+        <i class="fa fa-times"></i> {{'management.group.button.no' | translate}}
+      </button>
+      <button class="btn btn-primary ml-1 click-btn" (click)="onSave()">
+        <i class="fa fa-check"></i> {{'management.group.button.yes' | translate}}
+      </button>
+    </div>
+
+  </div>
+</ng-template>
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left title-upload">{{'management.target.modal.targetHeader' | translate}}</h4>
+    <button type="button" class="close pull-right" aria-label="Close">
+      <span aria-hidden="true" style="border: none">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    test
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>
+

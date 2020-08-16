@@ -1,0 +1,36 @@
+$border-bottom: rgba(0, 0, 0, 0.42);
+.vis-card-header-declare {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: .3rem .6rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.fix-margin{
+  margin-top: 0.49em !important;
+}
+.select-search {
+  width: 100%;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid $border-bottom;
+  height: 28.92px;
+  margin-top: 0.75em;
+}
+.validate-red {
+  color: #f44336;
+}
+.small-massage-declare {
+  font-size: 0.7rem;
+  position: absolute;
+  //bottom: -16px;
+  //left: 15px;
+}
+.small-massage {
+  position: absolute;
+  top: 3.5rem;
+  left: 16px;
+
+  //white-space: nowrap;
+}
+

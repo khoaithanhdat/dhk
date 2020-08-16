@@ -1,0 +1,156 @@
+<div class="w-100 group-target">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <label class="col-md-1 col-form-label text-no-pr">
+              Mã CTV
+            </label>
+            <div class="col-md-5">
+              <mat-form-field class="example-full-width">
+                <input matInput #message [(ngModel)]="mnbrCode" name="code"
+                     class="cvNumber" type="text" style="padding:0 .3rem" autocomplete="off" maxlength="20"/>
+              </mat-form-field>
+            </div>
+            <label class="col-md-1 col-form-label text-no-pr">
+              Tên CTV
+            </label>
+            <div class="col-md-5">
+              <mat-form-field class="example-full-width">
+                <input matInput #message [(ngModel)]="mstrNewName" name="name"
+                     class="cvNumber" type="text" style="padding:0 .3rem" autocomplete="off" maxlength="50"/>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-muted ">
+          <div class="row">
+            <div class="col-md-12 d-flex justify-content-center flex-wrap">
+              <button class="btn btn-primary m-2 btn-click" (click)="clickSearch()">
+                <i class="fa fa-search"></i> {{'management.group.button.search' | translate}}
+              </button>
+              <button class="btn btn-primary m-2 btn-click" (click)="openDialog(mapModel,true)">
+                <i class="fa fa-plus"></i> {{'management.group.button.add' | translate}}
+              </button>
+              <button class="btn btn-primary m-2 btn-click" (click)="confirm(template)">
+                <i class="fa fa-upload"></i> Import
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="table-responsive">
+        <table class="table table table-striped table-hover">
+          <thead class="header-table">
+          <tr style="text-align: center">
+            <th class="pointer">{{'management.target.table.header.order' | translate}}</th>
+            <th class="pointer" style="text-align: left;">Mã CTV</th>
+            <th class="pointer" style="text-align: left;">Tên CTV</th>
+            <th class="pointer">Ngày tạo</th>
+            <th class="pointer">Thao tác</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody *ngIf="!marrDataTable">
+          <td colspan="5" align="center">CTV không tồn tại</td>
+          </tbody>
+          <tbody *ngIf="marrDataTable">
+          <tr
+            *ngFor="let data of marrDataTable | paginate : {itemsPerPage: 10   , currentPage: mnbrP }; index as i">
+            <td style="text-align: center">{{((mnbrP - 1) * 10) + i + 1}}</td>
+            <td style="text-align: left" [tooltip]="data.code">{{data.code}}</td>
+            <td style="text-align: left" [tooltip]="data.code">{{data.name}}</td>
+            <td style="text-align: center" [tooltip]="data.createdDate">{{transformDate(data.createdDate)}}</td>
+            <td style="text-align: center;">
+              <a style="margin-bottom: -1rem !important;" href="javascript:void(0)"
+                (click)="openConfirm(deleteGroupCard, data.id , data.code)">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between"
+                          *ngIf="marrDataTable  && marrDataTable.length>0">
+                       <p style="margin-left: 5px;">
+                         {{'management.warningconfig.from' | translate}}{{mobjPager.page*10-9}}
+                         {{'management.warningconfig.to' | translate}}
+                         {{mobjPager.page*10 < marrDataTable.length ? mobjPager.page*10 : marrDataTable.length }}
+                         {{'management.warningconfig.of' | translate}} {{marrDataTable.length}}
+                         {{'management.warningconfig.record' | translate}}</p>
+                       <ul style="float:right;" class="pagination">
+                         <pagination-controls (pageChange)="pageChange($event)"
+                                              previousLabel="{{'management.target.table.pager.previous' | translate}}"
+                                              nextLabel="{{'management.target.table.pager.next' | translate}}"
+                                              (pageChange)="mbrp = $event">
+                         </pagination-controls>
+                       </ul>
+                     </div>
+
+
+    <ng-template #template>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left title-upload" >Import danh sách cộng tác viên</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="onBack()" size="6MB">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input style="cursor: pointer;" class="input-upload" type="file" accept=".xlsx" name="file"
+               (change)="selectFile($event)" size="6MB">
+        <div *ngIf="mblnCheckFileNull == true" style="color: red">{{'management.target.modal.fileNull' | translate}}</div>
+        <div *ngIf="mnbrCode == 200 && mstrMessageUpload == null && mblnIsSelectFile" style="color: #20a8d8">
+          {{'management.target.modal.uploaded' | translate}}: {{mnbrSumSuccessfulRecord}}/{{mnbrSumRecord}}
+          {{'management.target.table.record.record' | translate}}</div>
+        <div *ngIf="mnbrCode == 200 && mstrMessageUpload == null && mblnIsSelectFile">
+          {{'management.target.modal.resultDownload' | translate}}
+          (<a href="#/contributor" *ngIf ="mblnIsClickHere" (click)="downloadResult(mstrResultFileName)" class="a-upload">{{'management.target.modal.here' | translate}}</a>
+          <a href="#/contributor" *ngIf ="!mblnIsClickHere" (click)="downloadResult(mstrResultFileName)">{{'management.target.modal.here' | translate}}</a>)
+        </div>
+        <div *ngIf="mnbrCode == 200 && mstrMessageUpload && mblnIsSelectFile" style="color: red">{{mstrMessageUpload}}</div>
+        <div style="color: #20a8d8">
+          <a href="#/contributor" (click)="fileDownload()">Tải file mẫu</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary click-btn-upload"
+                (click)="onBack()"><i class="fa fa-sign-out"></i> Đóng
+        </button>
+        <button (click)="upLoad()" class="btn btn-primary click-btn-upload"
+                type="button"><i class="fa fa-upload"></i> Import
+        </button>
+      </div>
+    </ng-template>
+
+    <ng-template #deleteGroupCard>
+      <div class="row" style="margin-right: 0 !important; margin-left: 0 !important;">
+        <div class="col-md-10 modal-body">
+          <span> <img style="margin: 0 3px 3px 0;" src="assets/icons8-question-mark-16.png"
+                      alt="">Bạn có muốn xoá CTV {{contributorCode}} không ?</span>
+        </div>
+        <div class="col-md-2 modal-body">
+          <button type="button" class="close pull-right" aria-label="Close" (click)="onBack()" size="6MB">
+            <span aria-hidden="true" style="border: none">&times;</span>
+          </button>
+        </div>
+      </div>
+
+      <!--pop up xac nhan-->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary click-btn-upload" (click)=onBack() style="width: 88.64px;"><i
+          class="fa fa-times"></i>
+          {{'management.service.button.No' | translate}}
+        </button>
+        <button class="btn btn-primary click-btn-upload" type="button" (click)="onDelete()" style="width: 88.64px;"><i
+          class="fa fa-check"></i>
+          {{'management.service.button.Yes' | translate}}
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>

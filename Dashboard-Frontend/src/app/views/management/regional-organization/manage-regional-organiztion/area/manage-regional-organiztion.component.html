@@ -1,0 +1,211 @@
+
+         <!--<div class="card margin-bottom">-->
+         <div class="card no-mb w-100 load-area-container">
+           <!--<div *ngIf="selected" class="card-header text-left font-weight-bold">-->
+           <div *ngIf="selected" class="vis-card-header-custom">
+             <div>Tìm kiếm thông tin Viettel Tỉnh theo {{selected.text}}</div>
+           </div>
+           <div class="vis-card-body">
+             <div id="tabs">
+               <div class="container">
+                 <div class="form-group row my-2">
+                   <label class="col-md-2 d-flex align-items-center" for="">
+                     Mã VT Tỉnh
+                   </label>
+                   <div class="col-lg-4">
+                     <mat-form-field class="example-full-width">
+
+                       <input matInput name="employeeCode"  [(ngModel)]="employeeCode" maxlength="10">
+                     </mat-form-field>
+                   </div>
+                   <label class="col-md-2 d-flex align-items-center" for="">
+                     Tên VT Tỉnh
+                   </label>
+                   <div class="col-md-4">
+                     <mat-form-field class="example-full-width">
+                       <input matInput  name="employeeName" [(ngModel)]="employeeName" maxlength="50" >
+                     </mat-form-field>
+                   </div>
+                 </div>
+                 <div class="row mt-3">
+                   <div class="col-md-4 offset-md-2">
+                     <div class="button-group py-2">
+                       <button class="btn m-2 btn-primary" type="button" (click)="clickSearch()"><i class="fa fa-search"></i>
+                       {{'management.warningconfig.search' | translate}}
+                     </button>
+                     </div>
+                   </div>
+                 </div>
+                 <div class="row">
+                   <div class="col-md-12 py-3 d-flex justify-content-between">
+                     <div class="d-flex align-items-end font-weight-bold">Danh sách các tỉnh trực thuộc vùng</div>
+                     <button class="btn btn-primary m-2 btn-click" (click)="openDialogAdd(selected)">
+                       <i class="fa fa-plus"></i> {{'management.warningconfig.add' | translate}}
+                     </button>
+                   </div>
+                   <div class="col-md-12">
+                     <div class="table-responsive">
+                     <table class="table table-striped table-sm">
+                       <thead class="header-table">
+                       <tr>
+                         <th>STT</th>
+                         <th>Mã VT Tỉnh</th>
+                         <th>Tên ngắn</th>
+                         <th>Tên VT Tỉnh</th>
+                         <th>Vùng</th>
+                         <th>Ngày hiệu lực</th>
+                         <th>Ngày hết hạn</th>
+                         <th>Thao tác</th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr *ngIf=" !marrchildSearch.children || (marrchildSearch.children && marrchildSearch.children.length==0)">
+                         <td colspan="8" align="center" style="background: white">
+                           {{'management.warningconfig.Nodata' | translate}}
+                         </td>
+                       </tr>
+                       </tbody>
+                       <tbody *ngIf="marrchildSearch">
+                       <tr
+                         *ngFor="let child of marrchildSearch.children | paginate : {itemsPerPage: 10   , currentPage: mbrp }; index as i">
+
+                         <td>
+                           {{((mbrp - 1) * 10) + i + 1}}
+                         </td>
+                         <td>
+                           <div>
+                             {{child.code}}
+                           </div>
+                         </td>
+                         <td>
+                           <div>
+                             <!--{{marrchild.name}}-->
+                             {{child.shortName}}
+                           </div>
+                         </td>
+                         <td>
+                           <div>
+                             {{child.name}}
+                           </div>
+                         </td>
+                         <td>
+                           <div>
+                             {{child.parentName}}
+                           </div>
+                         </td>
+                         <td>
+                           <div>
+                             {{child.effectiveDate | date:'dd/MM/yyyy'}}
+                           </div>
+                         </td>
+                         <td>
+                           <div>
+                             {{child.expiredDate | date:'dd/MM/yyyy'}}
+                           </div>
+                         </td>
+                         <td class="text-center">
+                           <span style="margin-right: 7px" *ngIf="child.id != -1" data-toggle="tooltip" data-placement="top"
+                                 title="{{'management.declareVDS.tooltipChange' | translate}}" (click)="openDialogChange(child)">
+                             <i class="fa fa-exchange"  style="cursor: pointer;"></i></span>
+                            <span *ngIf="child.id != -1" (click)="openDialog(child)" data-toggle="tooltip" data-placement="top"
+                                  title="{{'management.weight.edit' | translate}}">
+                           <i class="fa fa-edit"  style="cursor: pointer;"></i></span>
+
+                         </td>
+
+                       </tr>
+                       </tbody>
+                     </table>
+                   </div>
+                     <div class="d-flex justify-content-between"
+                          *ngIf="marrchildSearch && marrchildSearch.children && marrchildSearch.children.length>0">
+                       <p style="margin-left: 5px;">
+                         {{'management.warningconfig.from' | translate}}{{mobjPager.page*10-9}}
+                         {{'management.warningconfig.to' | translate}}
+                         {{mobjPager.page*10 < marrchildSearch.children.length ? mobjPager.page*10 : marrchildSearch.children.length }}
+                         {{'management.warningconfig.of' | translate}} {{marrchildSearch.children.length}}
+                         {{'management.warningconfig.record' | translate}}</p>
+                       <ul style="float:right;" class="pagination">
+                         <pagination-controls (pageChange)="pageChange($event)"
+                                              previousLabel="{{'management.target.table.pager.previous' | translate}}"
+                                              nextLabel="{{'management.target.table.pager.next' | translate}}"
+                                              (pageChange)="mbrp = $event">
+                         </pagination-controls>
+                       </ul>
+                     </div>
+                     <!--<div class="col-lg-12" *ngIf="marrchild && marrchild.children && marrchild.children.length>0">-->
+                       <!--<div class="d-flex justify-content-center btn-update">-->
+                         <!--<button class="btn m-2 btn-primary" type="button"-->
+                                 <!--(click)="newObject()"><i class="fa fa-plus"></i>-->
+                           <!--{{'management.warningconfig.add' | translate}}-->
+                         <!--</button>-->
+                       <!--</div>-->
+                      <!--</div>-->
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+
+   <ng-template #confirm>
+      <div class="modal-body" *ngIf="changeParent == true">
+         <i style="font-size: 1.2em; color: #20a8d8" class="fa fa-question-circle"></i>
+         <span class="mx-1" *ngIf="mblnConfirm == 0"> {{'management.menu.lockparent' | translate}}</span>
+         <span class="mx-1" *ngIf="mblnConfirm == 1"> {{'management.menu.unlockparent' | translate}}</span>
+         <span class="mx-1" *ngIf="mblnConfirm == 2"> {{'management.menu.deleteparent' | translate}}</span>
+      </div>
+      <div class="modal-body" *ngIf="changeParent == false">
+         <i style="font-size: 1.2em; color: #20a8d8" class="fa fa-question-circle"></i>
+         <span class="mx-1" *ngIf="mblnConfirm == 0"> {{'management.warningconfig.lock?' | translate}}</span>
+         <span class="mx-1" *ngIf="mblnConfirm == 1"> {{'management.warningconfig.unlock?' | translate}}</span>
+         <span class="mx-1" *ngIf="mblnConfirm == 2"> {{'management.warningconfig.delete?' | translate}}</span>
+      </div>
+      <div class="modal-footer" *ngIf="changeParent == false">
+         <button class="m-2 btn btn-secondary click-btn" (click)="back()"><i class="fa fa-times"></i>
+            {{'management.warningconfig.No' | translate}}</button>
+         <button class="m-2 btn btn-primary click-btn" (click)="change(0, false)" *ngIf="mblnConfirm == 0"><i
+               class="fa fa-check"></i>
+            {{'management.warningconfig.Yes' | translate}}
+         </button>
+         <button class="m-2 btn btn-primary click-btn" (click)="change(1, false)" *ngIf="mblnConfirm == 1"><i
+               class="fa fa-check"></i>
+            {{'management.warningconfig.Yes' | translate}}
+         </button>
+         <button class="m-2 btn btn-primary click-btn" (click)="change(-1, false)" *ngIf="mblnConfirm == 2"><i
+               class="fa fa-check"></i>
+            {{'management.warningconfig.Yes' | translate}}
+         </button>
+      </div>
+
+      <div class="modal-footer" *ngIf="changeParent == true">
+         <button class="m-2 btn btn-secondary click-btn" (click)="back()"><i class="fa fa-times"></i>
+            {{'management.warningconfig.Cancel' | translate}}</button>
+
+         <button class="m-2 btn btn-primary click-btn" (click)="change(0,true)" *ngIf="mblnConfirm == 0"><i
+               class="fa fa-times"></i>
+            {{'management.warningconfig.No' | translate}}</button>
+         <button class="m-2 btn btn-primary click-btn" (click)="change(0,false)" *ngIf="mblnConfirm == 0"><i
+               class="fa fa-check"></i>
+            {{'management.warningconfig.Yes' | translate}}
+         </button>
+
+
+         <button class="m-2 btn btn-primary click-btn" (click)="change(1,true)" *ngIf="mblnConfirm == 1"><i
+               class="fa fa-times"></i>
+            {{'management.warningconfig.No' | translate}}</button>
+         <button class="m-2 btn btn-primary click-btn" (click)="change(1,false)" *ngIf="mblnConfirm == 1"><i
+               class="fa fa-check"></i>
+            {{'management.warningconfig.Yes' | translate}}
+         </button>
+
+
+         <button class="m-2 btn btn-primary click-btn" (click)="change(-1,true)" *ngIf="mblnConfirm == 2"><i
+               class="fa fa-times"></i>
+            {{'management.warningconfig.No' | translate}}</button>
+         <button class="m-2 btn btn-primary click-btn" (click)="change(-1,false)" *ngIf="mblnConfirm == 2"><i
+               class="fa fa-check"></i>
+            {{'management.warningconfig.Yes' | translate}}
+         </button>
+      </div>
+   </ng-template>
